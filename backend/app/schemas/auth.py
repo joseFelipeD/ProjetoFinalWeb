@@ -1,6 +1,6 @@
-from app.schemas.base import CamelModel
+from pydantic import BaseModel
 
 
-class Token(CamelModel):
+class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
