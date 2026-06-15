@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { Button, Field, SelectField, TextField } from '../ui';
 import type { NovaTurmaInput } from '../../types';
 
 type TurmaFormProps = {
@@ -32,32 +33,33 @@ export function TurmaForm({ onCancel, onSubmit }: TurmaFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {erro && <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{erro}</div>}
-      <div>
-        <label className="label">Nome da turma</label>
-        <input className="input" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Ex: 6º Ano C" />
-      </div>
+      <TextField
+        label="Nome da turma"
+        value={form.nome}
+        onChange={(e) => setForm({ ...form, nome: e.target.value })}
+        placeholder="Ex: 6º Ano C"
+      />
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="label">Série</label>
-          <select className="input" value={form.serie} onChange={(e) => setForm({ ...form, serie: e.target.value as NovaTurmaInput['serie'] })}>
-            <option>6º ano</option>
-            <option>7º ano</option>
-            <option>8º ano</option>
-            <option>9º ano</option>
-          </select>
-        </div>
-        <div>
-          <label className="label">Quantidade de alunos</label>
-          <input className="input" type="number" min={1} value={form.quantidadeAlunos} onChange={(e) => setForm({ ...form, quantidadeAlunos: Number(e.target.value) })} />
-        </div>
+        <SelectField
+          label="Série"
+          value={form.serie}
+          onChange={(e) => setForm({ ...form, serie: e.target.value as NovaTurmaInput['serie'] })}
+          options={['6º ano', '7º ano', '8º ano', '9º ano'].map((serie) => ({ value: serie, label: serie }))}
+        />
+        <TextField
+          label="Quantidade de alunos"
+          type="number"
+          min={1}
+          value={form.quantidadeAlunos}
+          onChange={(e) => setForm({ ...form, quantidadeAlunos: Number(e.target.value) })}
+        />
       </div>
-      <div>
-        <label className="label">Descrição pedagógica</label>
+      <Field label="Descrição pedagógica">
         <textarea className="input min-h-28 resize-none" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} placeholder="Descreva brevemente o perfil da turma." />
-      </div>
+      </Field>
       <div className="flex justify-end gap-3">
-        <button type="button" className="btn-secondary" onClick={onCancel}>Cancelar</button>
-        <button type="submit" className="btn-primary">Adicionar turma</button>
+        <Button variant="secondary" onClick={onCancel}>Cancelar</Button>
+        <Button type="submit">Adicionar turma</Button>
       </div>
     </form>
   );

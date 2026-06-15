@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import { BarChart3, BookOpen, BrainCircuit, FilePlus2, History, LayoutDashboard, LogOut, UserRound, UsersRound } from 'lucide-react';
+import { BrainCircuit, FilePlus2, History, LayoutDashboard, LogOut, UserRound, UsersRound } from 'lucide-react';
+import { Brand } from '../common/Brand';
+import { Avatar } from '../ui';
 import type { Page, Professor } from '../../types';
 
 type SidebarProps = {
@@ -20,14 +22,8 @@ const menu: Array<{ page: Page; label: string; icon: ReactNode }> = [
 export function Sidebar({ currentPage, professor, onNavigate, onLogout }: SidebarProps) {
   return (
     <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col bg-sidebar text-white lg:flex">
-      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600">
-          <BookOpen size={22} />
-        </div>
-        <div>
-          <p className="font-bold leading-tight">EduInsight</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300">IA pedagógica</p>
-        </div>
+      <div className="border-b border-white/10 px-5 py-5">
+        <Brand name="EduInsight" subtitle="IA pedagógica" />
       </div>
 
       <nav className="flex-1 px-3 py-6">
@@ -66,7 +62,7 @@ export function Sidebar({ currentPage, professor, onNavigate, onLogout }: Sideba
           <LogOut size={18} /> Sair
         </button>
         <div className="mt-4 flex items-center gap-3 rounded-2xl bg-white/8 p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold">MS</div>
+          <Avatar initials="MS" />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold">{professor.nomeExibicao}</p>
             <p className="text-xs text-slate-400">Professora</p>

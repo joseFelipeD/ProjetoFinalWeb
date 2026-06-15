@@ -1,6 +1,7 @@
 import { Lightbulb, ListChecks } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
 import { ObservacaoForm } from '../components/observacoes/ObservacaoForm';
+import { BulletList, Card, InfoCallout, LabeledProgress } from '../components/ui';
 import type { NovaObservacaoInput, Observacao, Turma } from '../types';
 
 type NovaObservacaoProps = {
@@ -9,10 +10,20 @@ type NovaObservacaoProps = {
   onAddObservacao: (observacao: NovaObservacaoInput) => void;
 };
 
+const dicas = [
+  'Seja específico sobre a situação observada.',
+  'Informe o contexto da atividade.',
+  'Evite registrar apenas aspectos negativos.',
+  'Descreva estratégias utilizadas e reações da turma.',
+  'Inclua sinais de aprendizagem, participação ou dificuldade.'
+];
+
 export function NovaObservacao({ turmas, observacoes, onAddObservacao }: NovaObservacaoProps) {
-  const aprendizagem = observacoes.filter((obs) => obs.categoria === 'Aprendizagem').length;
-  const comportamento = observacoes.filter((obs) => obs.categoria === 'Comportamento').length;
-  const participacao = observacoes.filter((obs) => obs.categoria === 'Participação').length;
+  const distribuicao = [
+    { label: 'Aprendizagem', total: observacoes.filter((obs) => obs.categoria === 'Aprendizagem').length, fator: 18, cor: 'bg-blue-500' },
+    { label: 'Comportamento', total: observacoes.filter((obs) => obs.categoria === 'Comportamento').length, fator: 22, cor: 'bg-red-500' },
+    { label: 'Participação', total: observacoes.filter((obs) => obs.categoria === 'Participação').length, fator: 22, cor: 'bg-green-500' }
+  ];
 
   return (
     <>
@@ -20,24 +31,23 @@ export function NovaObservacao({ turmas, observacoes, onAddObservacao }: NovaObs
       <div className="grid gap-6 xl:grid-cols-[1.4fr_0.7fr]">
         <ObservacaoForm turmas={turmas} onSubmit={onAddObservacao} />
         <aside className="space-y-5">
-          <section className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-            <div className="mb-3 flex items-center gap-2 font-bold text-blue-900"><Lightbulb size={19} /> Dicas para uma boa observação</div>
-            <ul className="space-y-3 text-sm leading-6 text-blue-800">
-              <li>• Seja específico sobre a situação observada.</li>
-              <li>• Informe o contexto da atividade.</li>
-              <li>• Evite registrar apenas aspectos negativos.</li>
-              <li>• Descreva estratégias utilizadas e reações da turma.</li>
-              <li>• Inclua sinais de aprendizagem, participação ou dificuldade.</li>
-            </ul>
-          </section>
-          <section className="card p-5">
-            <div className="mb-4 flex items-center gap-2 font-bold text-ink"><ListChecks size={19} /> Distribuição atual</div>
+          <InfoCallout className="p-5" title="Dicas para uma boa observação" icon={<Lightbulb size={19} />}>
+            <BulletList items={dicas} className="space-y-3 text-sm leading-6 text-blue-800" />
+          </InfoCallout>
+
+          <Card className="p-5" title="Distribuição atual" icon={<ListChecks size={19} className="text-ink" />}>
             <div className="space-y-4 text-sm">
-              <div><div className="mb-1 flex justify-between"><span>Aprendizagem</span><strong>{aprendizagem}</strong></div><div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-blue-500" style={{ width: `${Math.min(aprendizagem * 18, 100)}%` }} /></div></div>
-              <div><div className="mb-1 flex justify-between"><span>Comportamento</span><strong>{comportamento}</strong></div><div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-red-500" style={{ width: `${Math.min(comportamento * 22, 100)}%` }} /></div></div>
-              <div><div className="mb-1 flex justify-between"><span>Participação</span><strong>{participacao}</strong></div><div className="h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-green-500" style={{ width: `${Math.min(participacao * 22, 100)}%` }} /></div></div>
+              {distribuicao.map((item) => (
+                <LabeledProgress
+                  key={item.label}
+                  label={item.label}
+                  value={item.total}
+                  percent={item.total * item.fator}
+                  barClassName={item.cor}
+                />
+              ))}
             </div>
-          </section>
+          </Card>
         </aside>
       </div>
     </>

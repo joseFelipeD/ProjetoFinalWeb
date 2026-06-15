@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { BrainCircuit, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { BulletList, Button, Card, Field, IconBox, ProgressBar, SelectField, TextField } from '../components/ui';
 import type { Page, Turma } from '../types';
 
 type GerarRelatorioProps = {
@@ -15,6 +16,12 @@ const dimensoes = [
   'Avaliações e desempenho',
   'Relacionamento interpessoal',
   'Assiduidade e compromisso'
+];
+
+const analiseIA = [
+  'Padrões nas observações da turma.',
+  'Pontos recorrentes de aprendizagem e comportamento.',
+  'Sugestões pedagógicas para próximas aulas.'
 ];
 
 export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
@@ -51,34 +58,23 @@ export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
     <>
       <PageHeader title="Gerar relatório com IA" description="Configure os parâmetros e simule a análise das observações pedagógicas." />
       <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <section className="card p-6">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="rounded-2xl bg-blue-50 p-3 text-primary"><BrainCircuit /></div>
-            <div>
-              <h2 className="font-bold text-ink">Configuração do relatório</h2>
-              <p className="text-sm text-slate-500">Selecione turma, período e dimensões da análise.</p>
-            </div>
-          </div>
-
+        <Card
+          icon={<IconBox><BrainCircuit /></IconBox>}
+          title="Configuração do relatório"
+          subtitle="Selecione turma, período e dimensões da análise."
+        >
           <div className="space-y-5">
-            <div>
-              <label className="label">Turma *</label>
-              <select className="input" value={turmaId} onChange={(e) => setTurmaId(e.target.value)}>
-                {turmas.map((turma) => <option key={turma.id} value={turma.id}>{turma.nome}</option>)}
-              </select>
-            </div>
+            <SelectField
+              label="Turma *"
+              value={turmaId}
+              onChange={(e) => setTurmaId(e.target.value)}
+              options={turmas.map((turma) => ({ value: turma.id, label: turma.nome }))}
+            />
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="label">Data inicial</label>
-                <input className="input" type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} />
-              </div>
-              <div>
-                <label className="label">Data final</label>
-                <input className="input" type="date" value={fim} onChange={(e) => setFim(e.target.value)} />
-              </div>
+              <TextField label="Data inicial" type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} />
+              <TextField label="Data final" type="date" value={fim} onChange={(e) => setFim(e.target.value)} />
             </div>
-            <div>
-              <label className="label">Dimensões de análise</label>
+            <Field label="Dimensões de análise">
               <div className="grid gap-3 sm:grid-cols-2">
                 {dimensoes.map((item) => (
                   <label key={item} className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-medium text-slate-700">
@@ -87,36 +83,30 @@ export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
                   </label>
                 ))}
               </div>
-            </div>
+            </Field>
             {gerando ? (
               <div className="rounded-2xl bg-blue-50 p-5">
                 <div className="mb-2 flex justify-between text-sm font-bold text-blue-800"><span>Simulando análise da IA...</span><span>{progresso}%</span></div>
-                <div className="h-3 rounded-full bg-white"><div className="h-3 rounded-full bg-primary transition-all" style={{ width: `${progresso}%` }} /></div>
+                <ProgressBar value={progresso} heightClassName="h-3" trackClassName="bg-white" barClassName="bg-primary" />
               </div>
             ) : (
-              <button className="btn-primary" onClick={gerarRelatorio} disabled={!turmaId || selecionadas.length === 0}>Gerar relatório</button>
+              <Button onClick={gerarRelatorio} disabled={!turmaId || selecionadas.length === 0}>Gerar relatório</Button>
             )}
           </div>
-        </section>
+        </Card>
 
         <aside className="space-y-5">
-          <section className="rounded-3xl bg-blue-700 p-6 text-white shadow-card">
-            <h2 className="mb-4 text-lg font-bold">O que a IA analisará?</h2>
-            <ul className="space-y-3 text-sm text-blue-50">
-              <li>• Padrões nas observações da turma.</li>
-              <li>• Pontos recorrentes de aprendizagem e comportamento.</li>
-              <li>• Sugestões pedagógicas para próximas aulas.</li>
-            </ul>
-          </section>
-          <section className="card p-5">
-            <h2 className="mb-3 font-bold text-ink">Resumo da configuração</h2>
+          <Card variant="dark" title="O que a IA analisará?">
+            <BulletList items={analiseIA} className="space-y-3 text-sm text-blue-50" />
+          </Card>
+          <Card className="p-5" title="Resumo da configuração">
             <div className="space-y-3 text-sm text-slate-600">
               <p><strong>Turma:</strong> {turmaSelecionada?.nome}</p>
               <p><strong>Período:</strong> {new Date(inicio).toLocaleDateString('pt-BR')} até {new Date(fim).toLocaleDateString('pt-BR')}</p>
               <p><strong>Dimensões:</strong> {selecionadas.length}</p>
               <p className="flex items-center gap-2 text-green-700"><CheckCircle2 size={16} /> Pronto para gerar</p>
             </div>
-          </section>
+          </Card>
         </aside>
       </div>
     </>

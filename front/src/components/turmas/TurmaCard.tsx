@@ -1,4 +1,5 @@
 import { Eye, UsersRound } from 'lucide-react';
+import { StatBox } from '../ui';
 import type { Turma } from '../../types';
 
 type TurmaCardProps = {
@@ -28,14 +29,8 @@ export function TurmaCard({ turma, observacoesCount, onView }: TurmaCardProps) {
       </div>
       <p className="mt-4 text-sm text-slate-500">{turma.descricao}</p>
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-white/80 p-4">
-          <strong className="block text-2xl text-ink">{turma.quantidadeAlunos}</strong>
-          <span className="text-xs text-slate-500">alunos</span>
-        </div>
-        <div className="rounded-xl bg-white/80 p-4">
-          <strong className="block text-2xl text-ink">{observacoesCount}</strong>
-          <span className="text-xs text-slate-500">observações</span>
-        </div>
+        <StatBox value={turma.quantidadeAlunos} label="alunos" />
+        <StatBox value={observacoesCount} label="observações" />
       </div>
       <button type="button" onClick={() => onView(turma.id)} className="mt-4 flex w-full items-center justify-between rounded-xl border border-current/20 bg-white/70 px-4 py-3 text-sm font-semibold">
         <span className="flex items-center gap-2"><Eye size={16} /> Visualizar turma</span>

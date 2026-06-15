@@ -1,11 +1,12 @@
 # Dependências
 node_modules/
-frontend/node_modules/
+front/node_modules/
 
 # Build
 dist/
 build/
-frontend/dist/
+front/dist/
+*.tsbuildinfo
 
 # Ambiente
 .env

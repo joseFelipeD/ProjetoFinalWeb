@@ -1,4 +1,6 @@
-import { BookOpen, CheckCircle2, Lock, Mail } from 'lucide-react';
+import { CheckCircle2, Lock, Mail } from 'lucide-react';
+import { Brand } from '../components/common/Brand';
+import { Button, Field, IconInput } from '../components/ui';
 
 type LoginProps = {
   onLogin: () => void;
@@ -9,12 +11,8 @@ export function Login({ onLogin }: LoginProps) {
     <main className="min-h-screen bg-gradient-to-br from-[#0b1733] via-[#132452] to-[#1d4ed8] p-6 text-white">
       <div className="mx-auto flex min-h-[calc(100vh-48px)] max-w-7xl items-center justify-between gap-12">
         <section className="hidden max-w-2xl lg:block">
-          <div className="mb-28 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600"><BookOpen /></div>
-            <div>
-              <p className="text-xl font-bold">EduInsight IA</p>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-300">plataforma pedagógica</p>
-            </div>
+          <div className="mb-28">
+            <Brand name="EduInsight IA" subtitle="plataforma pedagógica" size="md" />
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-400/10 px-4 py-2 text-sm font-semibold text-blue-200">
             <CheckCircle2 size={16} /> Apoio à educação básica
@@ -34,21 +32,13 @@ export function Login({ onLogin }: LoginProps) {
           <h2 className="text-2xl font-bold">Bem-vindo de volta</h2>
           <p className="mt-2 text-sm text-slate-500">Acesse sua conta para gerenciar suas turmas.</p>
           <form className="mt-8 space-y-4" onSubmit={(e) => { e.preventDefault(); onLogin(); }}>
-            <div>
-              <label className="label">E-mail</label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input className="input-icon" defaultValue="maria@escola.edu.br" />
-              </div>
-            </div>
-            <div>
-              <label className="label">Senha</label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input className="input-icon" defaultValue="12345678" type="password" />
-              </div>
-            </div>
-            <button className="btn-primary w-full" type="submit">Entrar na plataforma</button>
+            <Field label="E-mail">
+              <IconInput icon={<Mail size={18} />} defaultValue="maria@escola.edu.br" />
+            </Field>
+            <Field label="Senha">
+              <IconInput icon={<Lock size={18} />} defaultValue="12345678" type="password" />
+            </Field>
+            <Button type="submit" className="w-full">Entrar na plataforma</Button>
           </form>
           <p className="mt-6 border-t border-slate-100 pt-5 text-center text-xs text-slate-400">Seguro • Gratuito • Focado em professores</p>
         </section>

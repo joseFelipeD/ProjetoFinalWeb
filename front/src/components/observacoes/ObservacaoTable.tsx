@@ -1,5 +1,6 @@
 import { Eye, Trash2 } from 'lucide-react';
 import { CategoryBadge } from '../common/CategoryBadge';
+import { Button, EmptyState } from '../ui';
 import type { Observacao, Turma } from '../../types';
 
 type ObservacaoTableProps = {
@@ -28,7 +29,7 @@ export function ObservacaoTable({ observacoes, turmas, onDelete }: ObservacaoTab
           </thead>
           <tbody className="divide-y divide-slate-100">
             {observacoes.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-10 text-center text-slate-500">Nenhuma observação encontrada para os filtros selecionados.</td></tr>
+              <tr><td colSpan={5}><EmptyState message="Nenhuma observação encontrada para os filtros selecionados." /></td></tr>
             ) : (
               observacoes.map((obs) => (
                 <tr key={obs.id} className="hover:bg-slate-50">
@@ -38,8 +39,8 @@ export function ObservacaoTable({ observacoes, turmas, onDelete }: ObservacaoTab
                   <td className="px-5 py-4 text-slate-600">{new Date(obs.dataObservacao).toLocaleDateString('pt-BR')}</td>
                   <td className="px-5 py-4">
                     <div className="flex gap-2">
-                      <button type="button" className="btn-secondary !px-3 !py-2"><Eye size={15} /> Visualizar</button>
-                      <button type="button" className="btn-danger" onClick={() => onDelete(obs.id)}><Trash2 size={15} /> Excluir</button>
+                      <Button variant="secondary" className="!px-3 !py-2" icon={<Eye size={15} />}>Visualizar</Button>
+                      <Button variant="danger" icon={<Trash2 size={15} />} onClick={() => onDelete(obs.id)}>Excluir</Button>
                     </div>
                   </td>
                 </tr>

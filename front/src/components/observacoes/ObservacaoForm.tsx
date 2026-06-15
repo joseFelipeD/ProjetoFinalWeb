@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import { categorias } from '../../data/seedData';
+import { Button, Field, SelectableChip, SelectField, TextField } from '../ui';
 import type { CategoriaObservacao, NovaObservacaoInput, Turma } from '../../types';
 
 type ObservacaoFormProps = {
@@ -43,16 +45,13 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
       <section className="card p-5">
         <h2 className="mb-4 font-bold text-ink">Informações básicas</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">Turma *</label>
-            <select className="input" value={turmaId} onChange={(e) => setTurmaId(Number(e.target.value))}>
-              {turmas.map((turma) => <option key={turma.id} value={turma.id}>{turma.nome}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="label">Data da observação *</label>
-            <input className="input" type="date" value={dataObservacao} onChange={(e) => setDataObservacao(e.target.value)} />
-          </div>
+          <SelectField
+            label="Turma *"
+            value={turmaId}
+            onChange={(e) => setTurmaId(Number(e.target.value))}
+            options={turmas.map((turma) => ({ value: turma.id, label: turma.nome }))}
+          />
+          <TextField label="Data da observação *" type="date" value={dataObservacao} onChange={(e) => setDataObservacao(e.target.value)} />
         </div>
       </section>
 
@@ -60,14 +59,7 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
         <h2 className="mb-4 font-bold text-ink">Categoria da observação *</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {categorias.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setCategoria(item)}
-              className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${categoria === item ? 'border-primary bg-blue-50 text-primary ring-4 ring-blue-100' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
-            >
-              {item}
-            </button>
+            <SelectableChip key={item} label={item} selected={categoria === item} onClick={() => setCategoria(item)} />
           ))}
         </div>
       </section>
@@ -75,12 +67,8 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
       <section className="card p-5">
         <h2 className="mb-4 font-bold text-ink">Conteúdo da observação</h2>
         <div className="space-y-4">
-          <div>
-            <label className="label">Título *</label>
-            <input className="input" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Dificuldade de leitura interpretativa" />
-          </div>
-          <div>
-            <label className="label">Descrição detalhada *</label>
+          <TextField label="Título *" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Dificuldade de leitura interpretativa" />
+          <Field label="Descrição detalhada *">
             <textarea
               className="input min-h-44 resize-none"
               value={descricao}
@@ -90,12 +78,12 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
             <p className={`mt-2 text-xs font-medium ${detalhesSuficientes ? 'text-green-600' : 'text-slate-400'}`}>
               {detalhesSuficientes ? 'Descrição com detalhes suficientes para uma boa análise.' : 'Quanto mais contexto, melhor será o relatório da IA.'}
             </p>
-          </div>
+          </Field>
         </div>
       </section>
 
       <div className="flex justify-end">
-        <button type="submit" className="btn-primary">Salvar observação</button>
+        <Button type="submit">Salvar observação</Button>
       </div>
     </form>
   );

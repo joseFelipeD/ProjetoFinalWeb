@@ -4,6 +4,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { TurmaCard } from '../components/turmas/TurmaCard';
 import { TurmaForm } from '../components/turmas/TurmaForm';
 import { TurmaTable } from '../components/turmas/TurmaTable';
+import { Button, InfoCallout, Modal } from '../components/ui';
 import type { NovaTurmaInput, Observacao, Turma } from '../types';
 
 type TurmasProps = {
@@ -28,7 +29,7 @@ export function Turmas({ turmas, observacoes, onAddTurma }: TurmasProps) {
       <PageHeader
         title="Gerenciamento de turmas"
         description="Turmas dos anos finais do Ensino Fundamental."
-        action={<button className="btn-primary" onClick={() => setShowModal(true)}><Plus size={18} /> Adicionar turma</button>}
+        action={<Button icon={<Plus size={18} />} onClick={() => setShowModal(true)}>Adicionar turma</Button>}
       />
 
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -37,9 +38,9 @@ export function Turmas({ turmas, observacoes, onAddTurma }: TurmasProps) {
       </div>
 
       {turmaSelecionada && (
-        <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
+        <InfoCallout className="mb-5 p-4">
           <strong>Turma selecionada:</strong> {turmaSelecionada.nome}. {turmaSelecionada.descricao}
-        </div>
+        </InfoCallout>
       )}
 
       <div className="grid gap-5 xl:grid-cols-2">
@@ -53,24 +54,19 @@ export function Turmas({ turmas, observacoes, onAddTurma }: TurmasProps) {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="mb-5 flex items-start justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-ink">Adicionar turma</h2>
-                <p className="text-sm text-slate-500">Cadastre uma nova turma dos anos finais do Ensino Fundamental.</p>
-              </div>
-              <button className="rounded-full bg-slate-100 px-3 py-1 text-slate-500" onClick={() => setShowModal(false)}>×</button>
-            </div>
-            <TurmaForm
-              onCancel={() => setShowModal(false)}
-              onSubmit={(turma) => {
-                onAddTurma(turma);
-                setShowModal(false);
-              }}
-            />
-          </div>
-        </div>
+        <Modal
+          title="Adicionar turma"
+          description="Cadastre uma nova turma dos anos finais do Ensino Fundamental."
+          onClose={() => setShowModal(false)}
+        >
+          <TurmaForm
+            onCancel={() => setShowModal(false)}
+            onSubmit={(turma) => {
+              onAddTurma(turma);
+              setShowModal(false);
+            }}
+          />
+        </Modal>
       )}
     </>
   );
