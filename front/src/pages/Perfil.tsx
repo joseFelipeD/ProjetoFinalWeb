@@ -1,5 +1,6 @@
 import { PageHeader } from '../components/common/PageHeader';
 import { Avatar, Card, StatGroup, TextField } from '../components/ui';
+import { getIniciais } from '../utils/getIniciais';
 import type { Professor, Turma, Observacao } from '../types';
 
 type PerfilProps = {
@@ -7,15 +8,6 @@ type PerfilProps = {
   turmas: Turma[];
   observacoes: Observacao[];
 };
-
-function getIniciais(nome: string) {
-  return nome
-    .split(' ')
-    .slice(0, 2)
-    .map((parte) => parte.charAt(0))
-    .join('')
-    .toUpperCase();
-}
 
 export function Perfil({ professor, turmas, observacoes }: PerfilProps) {
   return (

@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { Field } from './Field';
 
@@ -6,10 +7,13 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   fieldClassName?: string;
 };
 
-export function TextField({ label, fieldClassName, className = '', ...rest }: TextFieldProps) {
+export function TextField({ label, fieldClassName, id, className = '', ...rest }: TextFieldProps) {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+
   return (
-    <Field label={label} className={fieldClassName}>
-      <input className={`input ${className}`.trim()} {...rest} />
+    <Field label={label} htmlFor={inputId} className={fieldClassName}>
+      <input id={inputId} className={`input ${className}`.trim()} {...rest} />
     </Field>
   );
 }

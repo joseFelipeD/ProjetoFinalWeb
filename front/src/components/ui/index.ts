@@ -1,7 +1,10 @@
 export { Button } from './Button';
+export { Badge } from './Badge';
 export { Card } from './Card';
 export { IconBox } from './IconBox';
 export { InfoCallout } from './InfoCallout';
+export { FeedbackMessage } from './FeedbackMessage';
+export { FormSection } from './FormSection';
 export { ProgressBar } from './ProgressBar';
 export { LabeledProgress } from './LabeledProgress';
 export { BulletList } from './BulletList';
@@ -17,4 +20,5 @@ export { IconInput } from './IconInput';
 export { Select } from './Select';
 export type { SelectOption } from './Select';
 export { TextField } from './TextField';
+export { TextAreaField } from './TextAreaField';
 export { SelectField } from './SelectField';

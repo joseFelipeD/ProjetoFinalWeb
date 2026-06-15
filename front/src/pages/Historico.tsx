@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
 import { PageHeader } from '../components/common/PageHeader';
 import { ObservacaoTable } from '../components/observacoes/ObservacaoTable';
 import { Select } from '../components/ui';
+import { useObservacaoFilters } from '../hooks/useObservacaoFilters';
 import { categorias } from '../data/seedData';
 import type { CategoriaObservacao, Observacao, Turma } from '../types';
 
@@ -12,18 +12,7 @@ type HistoricoProps = {
 };
 
 export function Historico({ turmas, observacoes, onDelete }: HistoricoProps) {
-  const [busca, setBusca] = useState('');
-  const [turmaId, setTurmaId] = useState('todas');
-  const [categoria, setCategoria] = useState<CategoriaObservacao | 'todas'>('todas');
-
-  const filtradas = useMemo(() => {
-    return observacoes.filter((obs) => {
-      const textoOk = obs.titulo.toLowerCase().includes(busca.toLowerCase()) || obs.descricao.toLowerCase().includes(busca.toLowerCase());
-      const turmaOk = turmaId === 'todas' || obs.turmaId === Number(turmaId);
-      const categoriaOk = categoria === 'todas' || obs.categoria === categoria;
-      return textoOk && turmaOk && categoriaOk;
-    });
-  }, [observacoes, busca, turmaId, categoria]);
+  const { busca, setBusca, turmaId, setTurmaId, categoria, setCategoria, filtradas } = useObservacaoFilters(observacoes);
 
   return (
     <>

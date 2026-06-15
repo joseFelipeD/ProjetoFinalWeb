@@ -1,3 +1,4 @@
+import { Badge } from '../ui';
 import type { CategoriaObservacao } from '../../types';
 
 type CategoryBadgeProps = {
@@ -14,9 +15,5 @@ const styles: Record<CategoriaObservacao, string> = {
 };
 
 export function CategoryBadge({ categoria }: CategoryBadgeProps) {
-  return (
-    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${styles[categoria]}`}>
-      {categoria}
-    </span>
-  );
+  return <Badge className={styles[categoria]}>{categoria}</Badge>;
 }

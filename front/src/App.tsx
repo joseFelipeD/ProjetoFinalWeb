@@ -54,7 +54,7 @@ export default function App() {
 
   return (
     <AppLayout currentPage={currentPage} professor={professorInicial} onNavigate={navigate} onLogout={() => setIsLoggedIn(false)}>
-      {currentPage === 'dashboard' && <Dashboard turmas={turmas} observacoes={observacoes} relatorio={relatorioInicial} onNavigate={navigate} />}
+      {currentPage === 'dashboard' && <Dashboard turmas={turmas} observacoes={observacoes} onNavigate={navigate} />}
       {currentPage === 'turmas' && <Turmas turmas={turmas} observacoes={observacoes} onAddTurma={addTurma} />}
       {currentPage === 'nova-observacao' && <NovaObservacao turmas={turmas} observacoes={observacoes} onAddObservacao={addObservacao} />}
       {currentPage === 'historico' && <Historico turmas={turmas} observacoes={observacoes} onDelete={deleteObservacao} />}

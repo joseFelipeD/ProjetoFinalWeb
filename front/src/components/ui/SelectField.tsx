@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { SelectHTMLAttributes } from 'react';
 import { Field } from './Field';
 import { Select } from './Select';
@@ -9,10 +10,13 @@ type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'
   fieldClassName?: string;
 };
 
-export function SelectField({ label, options, fieldClassName, ...rest }: SelectFieldProps) {
+export function SelectField({ label, options, fieldClassName, id, ...rest }: SelectFieldProps) {
+  const generatedId = useId();
+  const selectId = id ?? generatedId;
+
   return (
-    <Field label={label} className={fieldClassName}>
-      <Select options={options} {...rest} />
+    <Field label={label} htmlFor={selectId} className={fieldClassName}>
+      <Select id={selectId} options={options} {...rest} />
     </Field>
   );
 }

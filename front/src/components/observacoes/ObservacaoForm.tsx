@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { categorias } from '../../data/seedData';
-import { Button, Field, SelectableChip, SelectField, TextField } from '../ui';
+import { Button, FeedbackMessage, FormSection, SelectableChip, SelectField, TextAreaField, TextField } from '../ui';
 import type { CategoriaObservacao, NovaObservacaoInput, Turma } from '../../types';
 
 type ObservacaoFormProps = {
@@ -17,6 +17,13 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [feedback, setFeedback] = useState<{ tipo: 'erro' | 'sucesso'; mensagem: string } | null>(null);
+
+  // Garante uma turma válida selecionada quando a lista chega/atualiza (ex.: vinda de API).
+  useEffect(() => {
+    if (turmas.length > 0 && !turmas.some((turma) => turma.id === turmaId)) {
+      setTurmaId(turmas[0].id);
+    }
+  }, [turmas, turmaId]);
 
   const detalhesSuficientes = useMemo(() => descricao.trim().length >= 60, [descricao]);
 
@@ -36,14 +43,9 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {feedback && (
-        <div className={`rounded-xl border px-4 py-3 text-sm font-semibold ${feedback.tipo === 'sucesso' ? 'border-green-100 bg-green-50 text-green-700' : 'border-red-100 bg-red-50 text-red-700'}`}>
-          {feedback.mensagem}
-        </div>
-      )}
+      {feedback && <FeedbackMessage tone={feedback.tipo === 'sucesso' ? 'success' : 'error'}>{feedback.mensagem}</FeedbackMessage>}
 
-      <section className="card p-5">
-        <h2 className="mb-4 font-bold text-ink">Informações básicas</h2>
+      <FormSection title="Informações básicas">
         <div className="grid gap-4 md:grid-cols-2">
           <SelectField
             label="Turma *"
@@ -53,34 +55,33 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
           />
           <TextField label="Data da observação *" type="date" value={dataObservacao} onChange={(e) => setDataObservacao(e.target.value)} />
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card p-5">
-        <h2 className="mb-4 font-bold text-ink">Categoria da observação *</h2>
+      <FormSection title="Categoria da observação *">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {categorias.map((item) => (
             <SelectableChip key={item} label={item} selected={categoria === item} onClick={() => setCategoria(item)} />
           ))}
         </div>
-      </section>
+      </FormSection>
 
-      <section className="card p-5">
-        <h2 className="mb-4 font-bold text-ink">Conteúdo da observação</h2>
+      <FormSection title="Conteúdo da observação">
         <div className="space-y-4">
           <TextField label="Título *" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Dificuldade de leitura interpretativa" />
-          <Field label="Descrição detalhada *">
-            <textarea
-              className="input min-h-44 resize-none"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Descreva o contexto da aula, quantos alunos foram afetados, comportamentos observados e estratégias utilizadas."
-            />
-            <p className={`mt-2 text-xs font-medium ${detalhesSuficientes ? 'text-green-600' : 'text-slate-400'}`}>
-              {detalhesSuficientes ? 'Descrição com detalhes suficientes para uma boa análise.' : 'Quanto mais contexto, melhor será o relatório da IA.'}
-            </p>
-          </Field>
+          <TextAreaField
+            label="Descrição detalhada *"
+            className="min-h-44 resize-none"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            placeholder="Descreva o contexto da aula, quantos alunos foram afetados, comportamentos observados e estratégias utilizadas."
+            hint={
+              <p className={`mt-2 text-xs font-medium ${detalhesSuficientes ? 'text-green-600' : 'text-slate-400'}`}>
+                {detalhesSuficientes ? 'Descrição com detalhes suficientes para uma boa análise.' : 'Quanto mais contexto, melhor será o relatório da IA.'}
+              </p>
+            }
+          />
         </div>
-      </section>
+      </FormSection>
 
       <div className="flex justify-end">
         <Button type="submit">Salvar observação</Button>

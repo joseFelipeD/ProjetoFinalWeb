@@ -6,12 +6,11 @@ import { ObservacaoListItem } from '../components/observacoes/ObservacaoListItem
 import { ObservacoesAreaChart } from '../components/charts/ObservacoesAreaChart';
 import { Button, Card } from '../components/ui';
 import { observacoesPorMes } from '../data/seedData';
-import type { Observacao, Page, RelatorioIA, Turma } from '../types';
+import type { Observacao, Page, Turma } from '../types';
 
 type DashboardProps = {
   turmas: Turma[];
   observacoes: Observacao[];
-  relatorio: RelatorioIA;
   onNavigate: (page: Page) => void;
 };
 

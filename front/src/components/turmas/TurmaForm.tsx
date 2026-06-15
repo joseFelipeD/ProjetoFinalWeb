@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Button, Field, SelectField, TextField } from '../ui';
+import { Button, FeedbackMessage, SelectField, TextAreaField, TextField } from '../ui';
 import type { NovaTurmaInput } from '../../types';
 
 type TurmaFormProps = {
@@ -26,13 +26,14 @@ export function TurmaForm({ onCancel, onSubmit }: TurmaFormProps) {
       setErro('Informe o nome da turma e uma breve descrição.');
       return;
     }
+    setErro('');
     onSubmit(form);
     setForm(initialForm);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {erro && <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{erro}</div>}
+      {erro && <FeedbackMessage tone="error">{erro}</FeedbackMessage>}
       <TextField
         label="Nome da turma"
         value={form.nome}
@@ -54,9 +55,13 @@ export function TurmaForm({ onCancel, onSubmit }: TurmaFormProps) {
           onChange={(e) => setForm({ ...form, quantidadeAlunos: Number(e.target.value) })}
         />
       </div>
-      <Field label="Descrição pedagógica">
-        <textarea className="input min-h-28 resize-none" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} placeholder="Descreva brevemente o perfil da turma." />
-      </Field>
+      <TextAreaField
+        label="Descrição pedagógica"
+        className="min-h-28 resize-none"
+        value={form.descricao}
+        onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+        placeholder="Descreva brevemente o perfil da turma."
+      />
       <div className="flex justify-end gap-3">
         <Button variant="secondary" onClick={onCancel}>Cancelar</Button>
         <Button type="submit">Adicionar turma</Button>
