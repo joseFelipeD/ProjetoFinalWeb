@@ -1,32 +1,51 @@
+import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
 import { ChartPanel } from '../components/charts/ChartPanel';
 import { DimensoesBarChart } from '../components/charts/DimensoesBarChart';
 import { DistribuicaoPieChart } from '../components/charts/DistribuicaoPieChart';
 import { Card, InfoCallout } from '../components/ui';
+import { ultimoRelatorio } from '../services/relatorios';
 import type { RelatorioIA, Turma } from '../types';
 
 type RelatorioIAPageProps = {
-  relatorio: RelatorioIA;
   turmas: Turma[];
 };
 
-const barras = [
-  { nome: 'Aprendizagem', valor: 72 },
-  { nome: 'Participação', valor: 86 },
-  { nome: 'Comportamento', valor: 68 },
-  { nome: 'Avaliação', valor: 75 }
-];
+export function RelatorioIAPage({ turmas }: RelatorioIAPageProps) {
+  const [relatorio, setRelatorio] = useState<RelatorioIA | null>(null);
+  const [carregando, setCarregando] = useState(true);
 
-const pizza = [
-  { name: 'Aprendizagem', value: 38 },
-  { name: 'Participação', value: 25 },
-  { name: 'Comportamento', value: 21 },
-  { name: 'Outros', value: 16 }
-];
+  useEffect(() => {
+    ultimoRelatorio()
+      .then(setRelatorio)
+      .catch((erro) => console.error(erro))
+      .finally(() => setCarregando(false));
+  }, []);
 
-export function RelatorioIAPage({ relatorio, turmas }: RelatorioIAPageProps) {
+  if (carregando) {
+    return (
+      <>
+        <PageHeader title="Relatório com IA" description="Carregando análise pedagógica..." />
+        <Card className="p-6 text-slate-500">Carregando...</Card>
+      </>
+    );
+  }
+
+  if (!relatorio) {
+    return (
+      <>
+        <PageHeader title="Relatório com IA" description="Análise pedagógica gerada por IA." />
+        <Card className="p-6 text-slate-500">
+          Nenhum relatório gerado ainda. Use a tela <strong>“Gerar relatório com IA”</strong> para criar o primeiro.
+        </Card>
+      </>
+    );
+  }
+
   const turma = turmas.find((item) => item.id === relatorio.turmaId);
+  const barras = Object.entries(relatorio.indicadores).map(([nome, valor]) => ({ nome, valor }));
+  const pizza = Object.entries(relatorio.distribuicaoCategorias).map(([name, value]) => ({ name, value }));
 
   return (
     <>

@@ -1,29 +1,26 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { CheckCircle2, Lock, Mail } from "lucide-react";
 
 import { Brand } from "../components/common/Brand";
 import { Button, Field, IconInput } from "../components/ui";
-import { login } from "../services/auth";
+import { useAuth } from "../contexts/AuthContext";
 
-type LoginProps = {
-  onLogin: () => void;
-};
-
-export function Login({ onLogin }: LoginProps) {
+export function Login() {
+  const { entrar } = useAuth();
   const [email, setEmail] = useState("maria@escola.edu.br");
   const [senha, setSenha] = useState("123456");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     setErro("");
     setLoading(true);
 
     try {
-      await login(email, senha);
-      onLogin();
+      await entrar(email, senha);
     } catch (error) {
       console.error(error);
       setErro("E-mail ou senha inválidos.");

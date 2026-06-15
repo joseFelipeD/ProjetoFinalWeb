@@ -6,7 +6,7 @@ import type { CategoriaObservacao, NovaObservacaoInput, Turma } from '../../type
 
 type ObservacaoFormProps = {
   turmas: Turma[];
-  onSubmit: (observacao: NovaObservacaoInput) => void;
+  onSubmit: (observacao: NovaObservacaoInput) => void | Promise<void>;
 };
 
 export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
@@ -27,18 +27,23 @@ export function ObservacaoForm({ turmas, onSubmit }: ObservacaoFormProps) {
 
   const detalhesSuficientes = useMemo(() => descricao.trim().length >= 60, [descricao]);
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!turmaId || !titulo.trim() || !descricao.trim()) {
       setFeedback({ tipo: 'erro', mensagem: 'Preencha turma, título e descrição antes de salvar.' });
       return;
     }
 
-    onSubmit({ turmaId, dataObservacao, categoria, titulo, descricao });
-    setTitulo('');
-    setDescricao('');
-    setCategoria('Aprendizagem');
-    setFeedback({ tipo: 'sucesso', mensagem: 'Observação registrada com sucesso.' });
+    try {
+      await onSubmit({ turmaId, dataObservacao, categoria, titulo, descricao });
+      setTitulo('');
+      setDescricao('');
+      setCategoria('Aprendizagem');
+      setFeedback({ tipo: 'sucesso', mensagem: 'Observação registrada com sucesso.' });
+    } catch (erro) {
+      console.error(erro);
+      setFeedback({ tipo: 'erro', mensagem: 'Não foi possível salvar a observação. Tente novamente.' });
+    }
   }
 
   return (

@@ -7,7 +7,7 @@ import type { NovaObservacaoInput, Observacao, Turma } from '../types';
 type NovaObservacaoProps = {
   turmas: Turma[];
   observacoes: Observacao[];
-  onAddObservacao: (observacao: NovaObservacaoInput) => void;
+  onAddObservacao: (observacao: NovaObservacaoInput) => void | Promise<void>;
 };
 
 const dicas = [

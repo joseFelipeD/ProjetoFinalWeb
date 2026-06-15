@@ -10,7 +10,7 @@ import type { NovaTurmaInput, Observacao, Turma } from '../types';
 type TurmasProps = {
   turmas: Turma[];
   observacoes: Observacao[];
-  onAddTurma: (turma: NovaTurmaInput) => void;
+  onAddTurma: (turma: NovaTurmaInput) => void | Promise<void>;
 };
 
 export function Turmas({ turmas, observacoes, onAddTurma }: TurmasProps) {
@@ -61,8 +61,8 @@ export function Turmas({ turmas, observacoes, onAddTurma }: TurmasProps) {
         >
           <TurmaForm
             onCancel={() => setShowModal(false)}
-            onSubmit={(turma) => {
-              onAddTurma(turma);
+            onSubmit={async (turma) => {
+              await onAddTurma(turma);
               setShowModal(false);
             }}
           />

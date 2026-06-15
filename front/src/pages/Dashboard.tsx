@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BarChart3, FileText, UsersRound } from 'lucide-react';
 import { MetricCard } from '../components/common/MetricCard';
 import { PageHeader } from '../components/common/PageHeader';
@@ -5,7 +6,8 @@ import { AIReportBanner } from '../components/common/AIReportBanner';
 import { ObservacaoListItem } from '../components/observacoes/ObservacaoListItem';
 import { ObservacoesAreaChart } from '../components/charts/ObservacoesAreaChart';
 import { Button, Card } from '../components/ui';
-import { observacoesPorMes } from '../data/seedData';
+import { getObservacoesPorMes, getResumo } from '../services/dashboard';
+import type { ObservacoesPorMes, ResumoDashboard } from '../services/dashboard';
 import type { Observacao, Page, Turma } from '../types';
 
 type DashboardProps = {
@@ -15,6 +17,14 @@ type DashboardProps = {
 };
 
 export function Dashboard({ turmas, observacoes, onNavigate }: DashboardProps) {
+  const [resumo, setResumo] = useState<ResumoDashboard | null>(null);
+  const [porMes, setPorMes] = useState<ObservacoesPorMes[]>([]);
+
+  useEffect(() => {
+    getResumo().then(setResumo).catch((erro) => console.error(erro));
+    getObservacoesPorMes().then(setPorMes).catch((erro) => console.error(erro));
+  }, []);
+
   const ultimas = observacoes.slice(0, 4);
 
   return (
@@ -26,19 +36,19 @@ export function Dashboard({ turmas, observacoes, onNavigate }: DashboardProps) {
       />
 
       <div className="grid gap-5 md:grid-cols-3">
-        <MetricCard title="Turmas ativas" value={turmas.length} subtitle="6º ao 9º ano" icon={<UsersRound />} trend="+1 turma" />
-        <MetricCard title="Observações registradas" value={observacoes.length} subtitle="últimos 30 dias" icon={<FileText />} trend="+5 esta semana" />
-        <MetricCard title="Relatórios gerados" value={1} subtitle="análises pedagógicas" icon={<BarChart3 />} trend="+2 este mês" />
+        <MetricCard title="Turmas ativas" value={resumo?.turmasAtivas ?? turmas.length} subtitle="6º ao 9º ano" icon={<UsersRound />} />
+        <MetricCard title="Observações registradas" value={resumo?.observacoesTotal ?? observacoes.length} subtitle="no total" icon={<FileText />} />
+        <MetricCard title="Relatórios gerados" value={resumo?.relatoriosTotal ?? 0} subtitle="análises pedagógicas" icon={<BarChart3 />} />
       </div>
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[1.4fr_0.9fr]">
         <Card
           title="Observações por mês"
           subtitle="Quantidade de registros pedagógicos"
-          action={<span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary">2026</span>}
+          action={<span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-primary">{new Date().getFullYear()}</span>}
         >
           <div className="h-72">
-            <ObservacoesAreaChart data={observacoesPorMes} />
+            <ObservacoesAreaChart data={porMes} />
           </div>
         </Card>
 
@@ -47,9 +57,11 @@ export function Dashboard({ turmas, observacoes, onNavigate }: DashboardProps) {
           action={<Button variant="link" onClick={() => onNavigate('historico')}>Ver todas</Button>}
         >
           <div className="space-y-4">
-            {ultimas.map((obs) => (
-              <ObservacaoListItem key={obs.id} observacao={obs} />
-            ))}
+            {ultimas.length === 0 ? (
+              <p className="text-sm text-slate-400">Nenhuma observação registrada ainda.</p>
+            ) : (
+              ultimas.map((obs) => <ObservacaoListItem key={obs.id} observacao={obs} />)
+            )}
           </div>
         </Card>
       </div>

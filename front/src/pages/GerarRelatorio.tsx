@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { BrainCircuit, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
-import { BulletList, Button, Card, Field, IconBox, ProgressBar, SelectField, TextField } from '../components/ui';
+import { BulletList, Button, Card, Field, FeedbackMessage, IconBox, SelectField, TextField } from '../components/ui';
+import { gerarRelatorio as gerarRelatorioService } from '../services/relatorios';
 import type { Page, Turma } from '../types';
 
 type GerarRelatorioProps = {
@@ -30,7 +31,7 @@ export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
   const [fim, setFim] = useState('2026-06-08');
   const [selecionadas, setSelecionadas] = useState(dimensoes);
   const [gerando, setGerando] = useState(false);
-  const [progresso, setProgresso] = useState(0);
+  const [erro, setErro] = useState('');
 
   const turmaSelecionada = useMemo(() => turmas.find((turma) => turma.id === Number(turmaId)), [turmaId, turmas]);
 
@@ -38,20 +39,23 @@ export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
     setSelecionadas((atual) => atual.includes(item) ? atual.filter((dimensao) => dimensao !== item) : [...atual, item]);
   }
 
-  function gerarRelatorio() {
+  async function gerarRelatorio() {
     setGerando(true);
-    setProgresso(0);
-    const interval = window.setInterval(() => {
-      setProgresso((valor) => {
-        const novoValor = valor + 20;
-        if (novoValor >= 100) {
-          window.clearInterval(interval);
-          window.setTimeout(() => onNavigate('relatorio-ia'), 500);
-          return 100;
-        }
-        return novoValor;
+    setErro('');
+    try {
+      await gerarRelatorioService({
+        turmaId: Number(turmaId),
+        dataInicio: inicio,
+        dataFim: fim,
+        dimensoes: selecionadas
       });
-    }, 450);
+      onNavigate('relatorio-ia');
+    } catch (e) {
+      console.error(e);
+      setErro('Não foi possível gerar o relatório. Verifique se há observações da turma no período selecionado.');
+    } finally {
+      setGerando(false);
+    }
   }
 
   return (
@@ -84,14 +88,10 @@ export function GerarRelatorio({ turmas, onNavigate }: GerarRelatorioProps) {
                 ))}
               </div>
             </Field>
-            {gerando ? (
-              <div className="rounded-2xl bg-blue-50 p-5">
-                <div className="mb-2 flex justify-between text-sm font-bold text-blue-800"><span>Simulando análise da IA...</span><span>{progresso}%</span></div>
-                <ProgressBar value={progresso} heightClassName="h-3" trackClassName="bg-white" barClassName="bg-primary" />
-              </div>
-            ) : (
-              <Button onClick={gerarRelatorio} disabled={!turmaId || selecionadas.length === 0}>Gerar relatório</Button>
-            )}
+            {erro && <FeedbackMessage tone="error">{erro}</FeedbackMessage>}
+            <Button onClick={gerarRelatorio} disabled={gerando || !turmaId || selecionadas.length === 0}>
+              {gerando ? 'Gerando relatório...' : 'Gerar relatório'}
+            </Button>
           </div>
         </Card>
 

@@ -52,6 +52,11 @@ export type RelatorioIA = {
   sugestoes: string[];
   dataGeracao: string;
   aproveitamento: number;
+  dataInicio: string;
+  dataFim: string;
+  dimensoes: string[];
+  indicadores: Record<string, number>;
+  distribuicaoCategorias: Record<string, number>;
 };
 
 export type NovaObservacaoInput = Omit<Observacao, 'id'>;

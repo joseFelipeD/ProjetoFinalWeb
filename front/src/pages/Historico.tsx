@@ -8,7 +8,7 @@ import type { CategoriaObservacao, Observacao, Turma } from '../types';
 type HistoricoProps = {
   turmas: Turma[];
   observacoes: Observacao[];
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => void | Promise<void>;
 };
 
 export function Historico({ turmas, observacoes, onDelete }: HistoricoProps) {
@@ -16,7 +16,7 @@ export function Historico({ turmas, observacoes, onDelete }: HistoricoProps) {
 
   return (
     <>
-      <PageHeader title="Histórico de observações" description={`${observacoes.length} observações registradas em últimos 30 dias.`} />
+      <PageHeader title="Histórico de observações" description={`${observacoes.length} observações registradas no total.`} />
       <div className="mb-5 grid gap-3 md:grid-cols-[1fr_220px_220px]">
         <input className="input" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar observações..." />
         <Select

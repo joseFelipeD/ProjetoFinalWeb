@@ -5,7 +5,7 @@ import type { NovaTurmaInput } from '../../types';
 
 type TurmaFormProps = {
   onCancel: () => void;
-  onSubmit: (turma: NovaTurmaInput) => void;
+  onSubmit: (turma: NovaTurmaInput) => void | Promise<void>;
 };
 
 const initialForm: NovaTurmaInput = {
@@ -20,15 +20,20 @@ export function TurmaForm({ onCancel, onSubmit }: TurmaFormProps) {
   const [form, setForm] = useState<NovaTurmaInput>(initialForm);
   const [erro, setErro] = useState('');
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!form.nome.trim() || !form.descricao.trim()) {
       setErro('Informe o nome da turma e uma breve descrição.');
       return;
     }
     setErro('');
-    onSubmit(form);
-    setForm(initialForm);
+    try {
+      await onSubmit(form);
+      setForm(initialForm);
+    } catch (e) {
+      console.error(e);
+      setErro('Não foi possível salvar a turma. Tente novamente.');
+    }
   }
 
   return (

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
-import { professorInicial, relatorioInicial, turmasIniciais, observacoesIniciais } from './data/seedData';
+import { useAuth } from './contexts/AuthContext';
 import { Dashboard } from './pages/Dashboard';
 import { GerarRelatorio } from './pages/GerarRelatorio';
 import { Historico } from './pages/Historico';
@@ -9,58 +9,74 @@ import { NovaObservacao } from './pages/NovaObservacao';
 import { Perfil } from './pages/Perfil';
 import { RelatorioIAPage } from './pages/RelatorioIA';
 import { Turmas } from './pages/Turmas';
+import { criarTurma, listarTurmas } from './services/turmas';
+import { criarObservacao, excluirObservacao, listarObservacoes } from './services/observacoes';
 import type { NovaObservacaoInput, NovaTurmaInput, Observacao, Page, Turma } from './types';
 
-const cores: Turma['cor'][] = ['azul', 'roxo', 'verde', 'ciano'];
-
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { professor, isAuthenticated, carregando, sair } = useAuth();
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
-  const [turmas, setTurmas] = useState<Turma[]>(turmasIniciais);
-  const [observacoes, setObservacoes] = useState<Observacao[]>(observacoesIniciais);
+  const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [observacoes, setObservacoes] = useState<Observacao[]>([]);
+
+  const carregarDados = useCallback(async () => {
+    const [turmasApi, observacoesApi] = await Promise.all([
+      listarTurmas(),
+      listarObservacoes()
+    ]);
+    setTurmas(turmasApi);
+    setObservacoes(observacoesApi);
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      carregarDados().catch((erro) => console.error('Falha ao carregar dados:', erro));
+    }
+  }, [isAuthenticated, carregarDados]);
 
   function navigate(page: Page) {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function addObservacao(input: NovaObservacaoInput) {
-    const novaObservacao: Observacao = {
-      id: Date.now(),
-      ...input
-    };
-    setObservacoes((atuais) => [novaObservacao, ...atuais]);
+  async function addObservacao(input: NovaObservacaoInput) {
+    await criarObservacao(input);
+    await carregarDados();
   }
 
-  function deleteObservacao(id: number) {
-    const confirmar = window.confirm('Deseja excluir esta observação?');
-    if (confirmar) {
-      setObservacoes((atuais) => atuais.filter((obs) => obs.id !== id));
+  async function deleteObservacao(id: number) {
+    if (window.confirm('Deseja excluir esta observação?')) {
+      await excluirObservacao(id);
+      await carregarDados();
     }
   }
 
-  function addTurma(input: NovaTurmaInput) {
-    const novaTurma: Turma = {
-      id: Date.now(),
-      ...input,
-      cor: cores[turmas.length % cores.length]
-    };
-    setTurmas((atuais) => [...atuais, novaTurma]);
+  async function addTurma(input: NovaTurmaInput) {
+    await criarTurma(input);
+    await carregarDados();
   }
 
-  if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  if (carregando) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 text-slate-500">
+        Carregando...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !professor) {
+    return <Login />;
   }
 
   return (
-    <AppLayout currentPage={currentPage} professor={professorInicial} onNavigate={navigate} onLogout={() => setIsLoggedIn(false)}>
+    <AppLayout currentPage={currentPage} professor={professor} onNavigate={navigate} onLogout={sair}>
       {currentPage === 'dashboard' && <Dashboard turmas={turmas} observacoes={observacoes} onNavigate={navigate} />}
       {currentPage === 'turmas' && <Turmas turmas={turmas} observacoes={observacoes} onAddTurma={addTurma} />}
       {currentPage === 'nova-observacao' && <NovaObservacao turmas={turmas} observacoes={observacoes} onAddObservacao={addObservacao} />}
       {currentPage === 'historico' && <Historico turmas={turmas} observacoes={observacoes} onDelete={deleteObservacao} />}
       {currentPage === 'gerar-relatorio' && <GerarRelatorio turmas={turmas} onNavigate={navigate} />}
-      {currentPage === 'relatorio-ia' && <RelatorioIAPage relatorio={relatorioInicial} turmas={turmas} />}
-      {currentPage === 'perfil' && <Perfil professor={professorInicial} turmas={turmas} observacoes={observacoes} />}
+      {currentPage === 'relatorio-ia' && <RelatorioIAPage turmas={turmas} />}
+      {currentPage === 'perfil' && <Perfil professor={professor} turmas={turmas} observacoes={observacoes} />}
     </AppLayout>
   );
 }

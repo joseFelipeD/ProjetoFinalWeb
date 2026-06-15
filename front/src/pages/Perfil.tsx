@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { PageHeader } from '../components/common/PageHeader';
 import { Avatar, Card, StatGroup, TextField } from '../components/ui';
+import { getResumo } from '../services/dashboard';
 import { getIniciais } from '../utils/getIniciais';
 import type { Professor, Turma, Observacao } from '../types';
 
@@ -10,6 +12,14 @@ type PerfilProps = {
 };
 
 export function Perfil({ professor, turmas, observacoes }: PerfilProps) {
+  const [relatoriosTotal, setRelatoriosTotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    getResumo()
+      .then((resumo) => setRelatoriosTotal(resumo.relatoriosTotal))
+      .catch((erro) => console.error(erro));
+  }, []);
+
   return (
     <>
       <PageHeader title="Perfil do professor" description="Gerencie suas informações pessoais e preferências da conta." />
@@ -23,7 +33,7 @@ export function Perfil({ professor, turmas, observacoes }: PerfilProps) {
             stats={[
               { value: turmas.length, label: 'Turmas' },
               { value: observacoes.length, label: 'Obs.' },
-              { value: 1, label: 'Relatório' }
+              { value: relatoriosTotal ?? '—', label: 'Relatórios' }
             ]}
           />
         </Card>

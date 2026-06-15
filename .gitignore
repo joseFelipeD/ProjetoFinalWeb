@@ -8,6 +8,14 @@ build/
 front/dist/
 *.tsbuildinfo
 
+# Python / backend
+.venv/
+backend/.venv/
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite3
+
 # Ambiente
 .env
 .env.local
