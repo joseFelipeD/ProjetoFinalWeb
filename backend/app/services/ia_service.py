@@ -7,9 +7,9 @@ pontos de atenção e sugestões pedagógicas para a turma.
 
 Duas estratégias são suportadas:
 
-1. `_gerar_relatorio_anthropic`: usa a API da Anthropic (Claude) para
-   produzir uma análise em linguagem natural, caso `ANTHROPIC_API_KEY`
-   esteja configurada no `.env`.
+1. `_gerar_relatorio_gemini`: usa a API do Google Gemini para produzir
+   uma análise em linguagem natural, caso `GEMINI_API_KEY` esteja
+   configurada no `.env`.
 2. `_gerar_relatorio_heuristico`: gerador local baseado em regras,
    usado como fallback (ou quando nenhuma chave de API é configurada),
    garantindo que o projeto funcione "fora da caixa" mesmo sem acesso a
@@ -178,20 +178,21 @@ def _gerar_relatorio_heuristico(
     }
 
 
-def _gerar_relatorio_anthropic(
+def _gerar_relatorio_gemini(
     turma: Turma, observacoes: List[Observacao], dimensoes: List[str]
 ) -> dict:
-    """Gera o relatório pedagógico usando a API da Anthropic (Claude).
+    """Gera o relatório pedagógico usando a API do Google Gemini.
 
-    Requer `ANTHROPIC_API_KEY` configurada no `.env`. Em caso de erro
+    Requer `GEMINI_API_KEY` configurada no `.env`. Em caso de erro
     (rede, parsing, etc.), a exceção é propagada e tratada pela função
     pública `gerar_relatorio_pedagogico`, que recorre ao gerador
     heurístico.
     """
 
-    from anthropic import Anthropic
+    import google.generativeai as genai
 
-    client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    model = genai.GenerativeModel(settings.GEMINI_MODEL)
 
     registros = "\n".join(
         f"- [{obs.data_observacao.isoformat()}] ({obs.categoria}) "
@@ -207,8 +208,7 @@ def _gerar_relatorio_anthropic(
         "Observações registradas pelo professor:\n"
         f"{registros}\n\n"
         f"Dimensões de análise solicitadas: {', '.join(dimensoes)}.\n\n"
-        "Responda APENAS com um JSON válido (sem markdown, sem texto "
-        "adicional) no seguinte formato:\n"
+        "Responda com um JSON no seguinte formato:\n"
         "{\n"
         '  "resumo_gerado": "resumo com 2 a 4 frases sobre a turma",\n'
         '  "pontos_atencao": ["ponto 1", "ponto 2"],\n'
@@ -220,24 +220,12 @@ def _gerar_relatorio_anthropic(
         "cada dimensão solicitada, com valores entre 0 e 100."
     )
 
-    resposta = client.messages.create(
-        model=settings.ANTHROPIC_MODEL,
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
+    resposta = model.generate_content(
+        prompt,
+        generation_config={"response_mime_type": "application/json"},
     )
 
-    texto = "".join(
-        bloco.text for bloco in resposta.content if getattr(bloco, "type", None) == "text"
-    )
-
-    texto_limpo = texto.strip()
-    if texto_limpo.startswith("```"):
-        texto_limpo = texto_limpo.strip("`")
-        if texto_limpo.startswith("json"):
-            texto_limpo = texto_limpo[4:]
-        texto_limpo = texto_limpo.strip()
-
-    dados = json.loads(texto_limpo)
+    dados = json.loads(resposta.text)
 
     # A distribuição por categoria é sempre calculada a partir dos dados reais.
     dados["distribuicao_categorias"] = _distribuicao_categorias(observacoes)
@@ -257,15 +245,15 @@ def gerar_relatorio_pedagogico(
 ) -> dict:
     """Ponto de entrada do serviço de IA.
 
-    Tenta usar a Anthropic API caso esteja configurada; em qualquer falha
+    Tenta usar a API do Gemini caso esteja configurada; em qualquer falha
     (ou se a chave não estiver configurada), recorre ao gerador
     heurístico local, garantindo que `POST /relatorios/gerar` sempre
     retorne um resultado válido.
     """
 
-    if settings.ANTHROPIC_API_KEY:
+    if settings.GEMINI_API_KEY:
         try:
-            return _gerar_relatorio_anthropic(turma, observacoes, dimensoes)
+            return _gerar_relatorio_gemini(turma, observacoes, dimensoes)
         except Exception:
             return _gerar_relatorio_heuristico(turma, observacoes, dimensoes)
 

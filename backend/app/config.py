@@ -16,10 +16,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 horas
 
-    # IA (Anthropic) - opcional. Se não configurado, o serviço de IA
+    # IA (Google Gemini) - opcional. Se não configurado, o serviço de IA
     # usa um gerador heurístico baseado nas observações registradas.
-    ANTHROPIC_API_KEY: Optional[str] = None
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-6"
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     # CORS - origem do frontend Vite
     FRONTEND_ORIGIN: str = "http://localhost:5173"
